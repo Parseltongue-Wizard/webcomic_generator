@@ -29,3 +29,20 @@ def load_and_normalize_images(folder_path):
 folder_path = "Resized_data"
 normalized_images = load_and_normalize_images(folder_path)
 X_train, X_test = train_test_split(normalized_images, test_size=0.1, random_state=42)
+
+class Sampling(tf.keras.layers.Layer):
+    def call(self, inputs):
+        mean, log_var = inputs
+        return tf.random.normal(tf.shape(log_var)) *tf.exp(log_var / 2) + mean
+
+codings_size = 10
+
+inputs = Input(shape=(original_dim,))
+Z = Dense(intermediate_dim, activation='relu')(inputs)
+Z = Dense(latent_dim)(Z)
+Z = Dense(latent_dim)(Z)
+codings_mean = tf.keras.layers.Dense(codings_size)(Z) 
+codings_log_var = tf.keras.layers.Dense(codings_size)(Z)
+codings = Sampling()([codings_mean, codings_log_var])
+variational_encoder = tf.keras.Model(
+    inputs=[inputs], outputs=[codings_mean, codings_log_var, codings])
