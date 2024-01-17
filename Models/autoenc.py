@@ -28,4 +28,4 @@ def load_and_normalize_images(folder_path):
 
 folder_path = "Resized_data"
 normalized_images = load_and_normalize_images(folder_path)
-X_train, X_test = train_test_split(flattened_images, test_size=0.1, random_state=42)
+X_train, X_test = train_test_split(normalized_images, test_size=0.1, random_state=42)
