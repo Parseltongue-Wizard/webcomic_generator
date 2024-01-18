@@ -39,10 +39,17 @@ codings_size = 10
 
 inputs = Input(shape=(original_dim,))
 Z = Dense(intermediate_dim, activation='relu')(inputs)
-Z = Dense(latent_dim)(Z)
-Z = Dense(latent_dim)(Z)
+Z = Dense(latent_dim, activation='relu')(Z)
+
 codings_mean = tf.keras.layers.Dense(codings_size)(Z) 
 codings_log_var = tf.keras.layers.Dense(codings_size)(Z)
 codings = Sampling()([codings_mean, codings_log_var])
 variational_encoder = tf.keras.Model(
     inputs=[inputs], outputs=[codings_mean, codings_log_var, codings])
+
+decoder_inputs = tf.keras.layers.Input(shape=[codings_size])
+x = Dense(latent_dim, activation="relu")(decoder_inputs)
+x = Dense(intermediate_dim, activation="relu")(x)
+x = Dense(original_dim)(x)
+outputs = tf.keras.layers.Reshape([original_dim])(x)
+variational_decoder = tf.keras.Model(inputs=[decoder_inputs], outputs=[outputs])
